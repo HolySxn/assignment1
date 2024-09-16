@@ -1,13 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
 const bcrypt = require('bcryptjs');
-const pool = require('./db'); // Import the database connection
+const pool = require('./db'); 
 
 const app = express();
 const port = 3000;
 
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static('public')); // Serve HTML/CSS files
+app.use(express.static('public')); // Serve static files (HTML/CSS/JS)
+
 
 // Registration Route
 app.post('/register', async (req, res) => {
@@ -22,10 +26,10 @@ app.post('/register', async (req, res) => {
       'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id',
       [username, email, passwordHash]
     );
-    res.json({ message: 'User registered successfully!', userId: result.rows[0].id });
+    res.status(200).json({ message: 'User registered successfully!', userId: result.rows[0].id });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Registration failed!' });
+    console.error('Error during registration:', err);
+    res.status(500).json({ message: "There's already an account like this" });
   }
 });
 
@@ -47,14 +51,14 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password!' });
     }
 
-    res.json({ message: 'Login successful!' });
+    res.status(200).json({ message: 'Login successful!' });
   } catch (err) {
-    console.error(err);
+    console.error('Error during login:', err);
     res.status(500).json({ message: 'Login failed!' });
   }
 });
 
-// Start server
+// Start the server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });
