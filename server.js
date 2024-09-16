@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const path = require('path');
 const bcrypt = require('bcryptjs');
 const pool = require('./db'); 
 
